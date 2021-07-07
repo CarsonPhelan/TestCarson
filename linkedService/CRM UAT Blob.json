@@ -1,0 +1,11 @@
+{
+	"name": "CRM UAT Blob",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://mcmaster-uat.crm3.dynamics.com",
+			"accountKind": "BlobStorage"
+		}
+	}
+}
