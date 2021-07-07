@@ -1,0 +1,9 @@
+{
+	"name": "MCMDataFactory1",
+	"location": "canadacentral",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "1e9a4a82-066c-491d-b0cf-7bd27882a617",
+		"tenantId": "d6a61ec9-40af-489a-a59d-0f0a6e170c08"
+	}
+}
