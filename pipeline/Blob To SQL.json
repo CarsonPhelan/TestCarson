@@ -25,14 +25,7 @@
 						}
 					},
 					"sink": {
-						"type": "ParquetSink",
-						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings",
-							"copyBehavior": "FlattenHierarchy"
-						},
-						"formatSettings": {
-							"type": "ParquetWriteSettings"
-						}
+						"type": "SqlServerSink"
 					},
 					"enableStaging": false,
 					"translator": {
@@ -102,7 +95,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "McmHolidaysFlattened",
+						"referenceName": "Holidays",
 						"type": "DatasetReference"
 					}
 				]
