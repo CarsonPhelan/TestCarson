@@ -67,7 +67,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DestinationDataset_242')]",
+			"name": "[concat(parameters('factoryName'), '/McmHolidays')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -80,43 +80,85 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "MCMHolidays",
+						"fileName": "data_0a27ac1e-d873-49dd-ac5b-fc2014974cb8_e1e4202f-a7e5-4820-b6dc-cb1b26ed2f04.parquet",
 						"container": "cp-lake1"
 					},
 					"compressionCodec": "snappy"
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "scheduleId",
+						"type": "UTF8"
+					},
+					{
+						"name": "date",
+						"type": "UTF8"
+					},
+					{
+						"name": "description",
+						"type": "UTF8"
+					},
+					{
+						"name": "hours",
+						"type": "INT64"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SourceDataset_242')]",
+			"name": "[concat(parameters('factoryName'), '/McmHolidaysFlattened')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "McMasterAPIs",
+					"referenceName": "LocalBlob",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "FlatHolidays",
+						"container": "cp-lake1"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "scheduleId",
+						"type": "UTF8"
+					},
+					{
+						"name": "date",
+						"type": "UTF8"
+					},
+					{
+						"name": "description",
+						"type": "UTF8"
+					},
+					{
+						"name": "hours",
+						"type": "INT64"
+					}
+				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/McMasterAPIs')]"
+				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/CopyHolidayJSON')]",
+			"name": "[concat(parameters('factoryName'), '/Blob To SQL')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "Blob to SQL",
 				"activities": [
 					{
-						"name": "CopyHolidays",
+						"name": "GetHolidays",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
@@ -126,23 +168,21 @@
 							"secureOutput": false,
 							"secureInput": false
 						},
-						"userProperties": [
-							{
-								"name": "Destination",
-								"value": "cp-lake1//MCMHolidayJSON"
-							}
-						],
+						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "00:01:40",
-								"requestInterval": "00.00:00:00.010",
-								"requestMethod": "GET"
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
 							},
 							"sink": {
 								"type": "ParquetSink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureBlobStorageWriteSettings",
+									"copyBehavior": "FlattenHierarchy"
 								},
 								"formatSettings": {
 									"type": "ParquetWriteSettings"
@@ -154,54 +194,70 @@
 								"mappings": [
 									{
 										"source": {
-											"path": "[['scheduleId']"
+											"name": "scheduleId",
+											"type": "String",
+											"physicalType": "UTF8"
 										},
 										"sink": {
 											"name": "scheduleId",
-											"type": "String"
+											"type": "String",
+											"physicalType": "UTF8"
 										}
 									},
 									{
 										"source": {
-											"path": "[['date']"
+											"name": "date",
+											"type": "String",
+											"physicalType": "UTF8"
 										},
 										"sink": {
 											"name": "date",
-											"type": "String"
+											"type": "String",
+											"physicalType": "UTF8"
 										}
 									},
 									{
 										"source": {
-											"path": "[['description']"
+											"name": "description",
+											"type": "String",
+											"physicalType": "UTF8"
 										},
 										"sink": {
 											"name": "description",
-											"type": "String"
+											"type": "String",
+											"physicalType": "UTF8"
 										}
 									},
 									{
 										"source": {
-											"path": "[['hours']"
+											"name": "hours",
+											"type": "Int64",
+											"physicalType": "INT64"
 										},
 										"sink": {
 											"name": "hours",
-											"type": "Int64"
+											"type": "Int64",
+											"physicalType": "INT_64"
 										}
 									}
 								],
-								"collectionReference": "$['holidays']"
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
 							}
 						},
 						"inputs": [
 							{
-								"referenceName": "SourceDataset_242",
+								"referenceName": "McmHolidays",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "DestinationDataset_242",
+								"referenceName": "McmHolidaysFlattened",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -211,8 +267,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SourceDataset_242')]",
-				"[concat(variables('factoryId'), '/datasets/DestinationDataset_242')]"
+				"[concat(variables('factoryId'), '/datasets/McmHolidays')]",
+				"[concat(variables('factoryId'), '/datasets/McmHolidaysFlattened')]"
 			]
 		}
 	]
