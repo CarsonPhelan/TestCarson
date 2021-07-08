@@ -5,7 +5,7 @@
 		"type": "AzureBlobStorage",
 		"typeProperties": {
 			"serviceEndpoint": "https://mcmaster-uat.crm3.dynamics.com",
-			"accountKind": "Storage"
+			"accountKind": "BlobStorage"
 		}
 	}
 }
