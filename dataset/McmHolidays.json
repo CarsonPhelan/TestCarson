@@ -1,0 +1,37 @@
+{
+	"name": "McmHolidays",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LocalBlob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "data_0a27ac1e-d873-49dd-ac5b-fc2014974cb8_e1e4202f-a7e5-4820-b6dc-cb1b26ed2f04.parquet",
+				"container": "cp-lake1"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "scheduleId",
+				"type": "UTF8"
+			},
+			{
+				"name": "date",
+				"type": "UTF8"
+			},
+			{
+				"name": "description",
+				"type": "UTF8"
+			},
+			{
+				"name": "hours",
+				"type": "INT64"
+			}
+		]
+	}
+}

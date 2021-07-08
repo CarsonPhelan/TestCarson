@@ -1,0 +1,37 @@
+{
+	"name": "McmHolidaysFlattened",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LocalBlob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "FlatHolidays",
+				"container": "cp-lake1"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "scheduleId",
+				"type": "UTF8"
+			},
+			{
+				"name": "date",
+				"type": "UTF8"
+			},
+			{
+				"name": "description",
+				"type": "UTF8"
+			},
+			{
+				"name": "hours",
+				"type": "INT64"
+			}
+		]
+	}
+}
