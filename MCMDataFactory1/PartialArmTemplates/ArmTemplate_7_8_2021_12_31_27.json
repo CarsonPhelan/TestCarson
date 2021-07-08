@@ -1,0 +1,36 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "MCMDataFactory1"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/PSFTRestAPI')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "http://hrpre.mcmaster.ca:8000/PSIGW/RESTListeningConnector/PSFT_HR/ExecuteQuery.v1/PUBLIC/MCM_HR_POSITION_DATA_DBT/JSON/NONFILE?isconnectedquery=n&maxrows=3",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Basic",
+					"userName": "PHELANC",
+					"password": {
+						"type": "SecureString",
+						"value": "**********"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
