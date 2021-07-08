@@ -1,0 +1,12 @@
+{
+	"name": "McMasterAPIs",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://apis.mcmaster.ca/mcmaster-university/sandbox/holidays/MACUG/UGRD/2201",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
