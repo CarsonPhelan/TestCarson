@@ -1,0 +1,24 @@
+{
+	"name": "Trigger_81q",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "CopyHolidayAPI",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2021-07-08T15:01:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}
