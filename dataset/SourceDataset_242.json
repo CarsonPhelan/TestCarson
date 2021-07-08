@@ -1,0 +1,12 @@
+{
+	"name": "SourceDataset_242",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "McMasterAPIs",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}
