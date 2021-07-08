@@ -102,7 +102,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "McmHolidays",
+						"referenceName": "McmHolidaysFlattened",
 						"type": "DatasetReference"
 					}
 				]
