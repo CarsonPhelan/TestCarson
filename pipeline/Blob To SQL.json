@@ -1,0 +1,7 @@
+{
+	"name": "Blob To SQL",
+	"properties": {
+		"description": "Blob to SQL",
+		"annotations": []
+	}
+}
