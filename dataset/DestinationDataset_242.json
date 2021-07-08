@@ -1,0 +1,20 @@
+{
+	"name": "DestinationDataset_242",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LocalBlob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "MCMHolidayJSON",
+				"container": "cp-lake1"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
