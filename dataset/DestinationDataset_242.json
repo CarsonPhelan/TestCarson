@@ -10,6 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
+				"fileName": "MCMHolidays",
 				"container": "cp-lake1"
 			},
 			"compressionCodec": "snappy"
