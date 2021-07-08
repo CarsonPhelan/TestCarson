@@ -10,7 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "MCMHolidayJSON",
 				"container": "cp-lake1"
 			},
 			"compressionCodec": "snappy"
