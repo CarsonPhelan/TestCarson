@@ -1,0 +1,36 @@
+{
+	"name": "MergeCSVOutput",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LocalBlob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Merged.csv",
+				"folderPath": "TestMerge/Merged",
+				"container": "cp-lake1"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			}
+		]
+	}
+}
