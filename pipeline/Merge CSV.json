@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Merge CSV Files",
+				"name": "MergeCSV",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -20,6 +20,8 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
+							"wildcardFolderPath": "TestMerge",
+							"wildcardFileName": "*.csv",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
@@ -35,28 +37,22 @@
 						"formatSettings": {
 							"type": "DelimitedTextWriteSettings",
 							"quoteAllText": true,
-							"fileExtension": ".csv"
+							"fileExtension": ".txt"
 						}
 					},
 					"enableStaging": false,
-					"logSettings": {
-						"enableCopyActivityLog": true,
-						"copyActivityLogSettings": {
-							"logLevel": "Warning",
-							"enableReliableLogging": false
-						},
-						"logLocationSettings": {
-							"linkedServiceName": {
-								"referenceName": "LocalBlob",
-								"type": "LinkedServiceReference"
-							},
-							"path": "cp-lake1"
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
 						}
 					}
 				},
 				"inputs": [
 					{
-						"referenceName": "CRMCSV",
+						"referenceName": "LocalCSV",
 						"type": "DatasetReference"
 					}
 				],
