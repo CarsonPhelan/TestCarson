@@ -5,14 +5,26 @@
 		"factoryName": {
 			"value": "MCMDataFactory1"
 		},
+		"CRM UAT Blob_connectionString": {
+			"value": ""
+		},
 		"LocalBlob_connectionString": {
 			"value": ""
 		},
-		"CRM UAT Blob_properties_typeProperties_serviceEndpoint": {
-			"value": "https://mcmaster-uat.crm3.dynamics.com"
+		"PSFTRestAPI_password": {
+			"value": ""
+		},
+		"SqlServer_connectionString": {
+			"value": ""
 		},
 		"McMasterAPIs_properties_typeProperties_url": {
 			"value": "https://apis.mcmaster.ca/mcmaster-university/sandbox/holidays/MACUG/UGRD/2201"
+		},
+		"PSFTRestAPI_properties_typeProperties_url": {
+			"value": "http://hrpre.mcmaster.ca:8000/PSIGW/RESTListeningConnector/PSFT_HR/ExecuteQuery.v1/PUBLIC/MCM_HR_POSITION_DATA_DBT/JSON/NONFILE?isconnectedquery=n&maxrows=3"
+		},
+		"PSFTRestAPI_properties_typeProperties_userName": {
+			"value": "PHELANC"
 		}
 	}
 }

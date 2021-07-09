@@ -7,17 +7,33 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "MCMDataFactory1"
 		},
+		"CRM UAT Blob_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'CRM UAT Blob'"
+		},
 		"LocalBlob_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LocalBlob'"
 		},
-		"CRM UAT Blob_properties_typeProperties_serviceEndpoint": {
-			"type": "string",
-			"defaultValue": "https://mcmaster-uat.crm3.dynamics.com"
+		"PSFTRestAPI_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'PSFTRestAPI'"
+		},
+		"SqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SqlServer'"
 		},
 		"McMasterAPIs_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://apis.mcmaster.ca/mcmaster-university/sandbox/holidays/MACUG/UGRD/2201"
+		},
+		"PSFTRestAPI_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "http://hrpre.mcmaster.ca:8000/PSIGW/RESTListeningConnector/PSFT_HR/ExecuteQuery.v1/PUBLIC/MCM_HR_POSITION_DATA_DBT/JSON/NONFILE?isconnectedquery=n&maxrows=3"
+		},
+		"PSFTRestAPI_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "PHELANC"
 		}
 	},
 	"variables": {
@@ -32,8 +48,7 @@
 				"annotations": [],
 				"type": "AzureBlobStorage",
 				"typeProperties": {
-					"serviceEndpoint": "[parameters('CRM UAT Blob_properties_typeProperties_serviceEndpoint')]",
-					"accountKind": "BlobStorage"
+					"connectionString": "[parameters('CRM UAT Blob_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -65,6 +80,103 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PSFTRestAPI')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('PSFTRestAPI_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Basic",
+					"userName": "[parameters('PSFTRestAPI_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('PSFTRestAPI_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlServer')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('SqlServer_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CRMEmailCSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LocalBlob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "cp-lake1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DestinationDataset_81q')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LocalBlob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "data_0a27ac1e-d873-49dd-ac5b-fc2014974cb8_e1e4202f-a7e5-4820-b6dc-cb1b26ed2f04.parquet",
+						"container": "cp-lake1"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/McmHolidays')]",
@@ -151,14 +263,198 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Blob To SQL')]",
+			"name": "[concat(parameters('factoryName'), '/PSFT_Rest_API')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "PSFTRestAPI",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/PSFTRestAPI')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_81q')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "McMasterAPIs",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/McMasterAPIs')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CRMCSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "CRM UAT Blob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "00929a29-48ac-4b4e-8340-1d4414c630e4",
+						"folderPath": "csv/ActivityContactBlocked",
+						"container": "dynamicspbi"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/CRM UAT Blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CopyHolidayAPI')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "Blob to SQL",
 				"activities": [
 					{
-						"name": "GetHolidays",
+						"name": "Copy_81q",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "cp-lake1//data_0a27ac1e-d873-49dd-ac5b-fc2014974cb8_e1e4202f-a7e5-4820-b6dc-cb1b26ed2f04.parquet"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"logSettings": {
+								"enableCopyActivityLog": true,
+								"copyActivityLogSettings": {
+									"logLevel": "Warning",
+									"enableReliableLogging": false
+								},
+								"logLocationSettings": {
+									"linkedServiceName": {
+										"referenceName": "LocalBlob",
+										"type": "LinkedServiceReference"
+									},
+									"path": "cp-lake1"
+								}
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "[['scheduleId']"
+										},
+										"sink": {
+											"name": "scheduleId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['date']"
+										},
+										"sink": {
+											"name": "date",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['description']"
+										},
+										"sink": {
+											"name": "description",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['hours']"
+										},
+										"sink": {
+											"name": "hours",
+											"type": "Int64"
+										}
+									}
+								],
+								"collectionReference": "$['holidays']"
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SourceDataset_81q",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestinationDataset_81q",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_81q')]",
+				"[concat(variables('factoryId'), '/datasets/DestinationDataset_81q')]",
+				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Get CRM')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "TransCRMEmails",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
@@ -171,93 +467,122 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "ParquetSource",
+								"type": "DelimitedTextSource",
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
 									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
 								}
 							},
 							"sink": {
-								"type": "ParquetSink",
+								"type": "DelimitedTextSink",
 								"storeSettings": {
 									"type": "AzureBlobStorageWriteSettings",
 									"copyBehavior": "FlattenHierarchy"
 								},
 								"formatSettings": {
-									"type": "ParquetWriteSettings"
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".csv"
 								}
 							},
 							"enableStaging": false,
+							"logSettings": {
+								"enableCopyActivityLog": true,
+								"copyActivityLogSettings": {
+									"logLevel": "Warning",
+									"enableReliableLogging": false
+								},
+								"logLocationSettings": {
+									"linkedServiceName": {
+										"referenceName": "LocalBlob",
+										"type": "LinkedServiceReference"
+									},
+									"path": "cp-lake1"
+								}
+							},
 							"translator": {
 								"type": "TabularTranslator",
 								"mappings": [
 									{
 										"source": {
-											"name": "scheduleId",
-											"type": "String",
-											"physicalType": "UTF8"
+											"path": "$['name']"
 										},
 										"sink": {
-											"name": "scheduleId",
 											"type": "String",
-											"physicalType": "UTF8"
+											"ordinal": 1
 										}
 									},
 									{
 										"source": {
-											"name": "date",
-											"type": "String",
-											"physicalType": "UTF8"
+											"path": "$['description']"
 										},
 										"sink": {
-											"name": "date",
 											"type": "String",
-											"physicalType": "UTF8"
+											"ordinal": 2
 										}
 									},
 									{
 										"source": {
-											"name": "description",
-											"type": "String",
-											"physicalType": "UTF8"
+											"path": "$['version']"
 										},
 										"sink": {
-											"name": "description",
 											"type": "String",
-											"physicalType": "UTF8"
+											"ordinal": 3
 										}
 									},
 									{
 										"source": {
-											"name": "hours",
-											"type": "Int64",
-											"physicalType": "INT64"
+											"path": "[['$type']"
 										},
 										"sink": {
-											"name": "hours",
-											"type": "Int64",
-											"physicalType": "INT_64"
+											"type": "String",
+											"ordinal": 4
+										}
+									},
+									{
+										"source": {
+											"path": "[['name']"
+										},
+										"sink": {
+											"type": "String",
+											"ordinal": 5
+										}
+									},
+									{
+										"source": {
+											"path": "[['attributes'][0]['name']"
+										},
+										"sink": {
+											"type": "String",
+											"ordinal": 6
+										}
+									},
+									{
+										"source": {
+											"path": "[['attributes'][0]['dataType']"
+										},
+										"sink": {
+											"type": "String",
+											"ordinal": 7
 										}
 									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
+								]
 							}
 						},
 						"inputs": [
 							{
-								"referenceName": "McmHolidays",
+								"referenceName": "CRMCSV",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "McmHolidaysFlattened",
+								"referenceName": "CRMEmailCSV",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -267,8 +592,39 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/McmHolidays')]",
-				"[concat(variables('factoryId'), '/datasets/McmHolidaysFlattened')]"
+				"[concat(variables('factoryId'), '/datasets/CRMCSV')]",
+				"[concat(variables('factoryId'), '/datasets/CRMEmailCSV')]",
+				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Trigger_81q')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "CopyHolidayAPI",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 24,
+						"startTime": "2021-07-08T15:01:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/CopyHolidayAPI')]"
 			]
 		}
 	]

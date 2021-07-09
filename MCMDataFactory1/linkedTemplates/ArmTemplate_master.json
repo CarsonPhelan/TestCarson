@@ -7,17 +7,33 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "MCMDataFactory1"
 		},
+		"CRM UAT Blob_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'CRM UAT Blob'"
+		},
 		"LocalBlob_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LocalBlob'"
 		},
-		"CRM UAT Blob_properties_typeProperties_serviceEndpoint": {
-			"type": "string",
-			"defaultValue": "https://mcmaster-uat.crm3.dynamics.com"
+		"PSFTRestAPI_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'PSFTRestAPI'"
+		},
+		"SqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SqlServer'"
 		},
 		"McMasterAPIs_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://apis.mcmaster.ca/mcmaster-university/sandbox/holidays/MACUG/UGRD/2201"
+		},
+		"PSFTRestAPI_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "http://hrpre.mcmaster.ca:8000/PSIGW/RESTListeningConnector/PSFT_HR/ExecuteQuery.v1/PUBLIC/MCM_HR_POSITION_DATA_DBT/JSON/NONFILE?isconnectedquery=n&maxrows=3"
+		},
+		"PSFTRestAPI_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "PHELANC"
 		},
 		"containerUri": {
 			"type": "string",
@@ -46,14 +62,26 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"CRM UAT Blob_connectionString": {
+						"value": "[parameters('CRM UAT Blob_connectionString')]"
+					},
 					"LocalBlob_connectionString": {
 						"value": "[parameters('LocalBlob_connectionString')]"
 					},
-					"CRM UAT Blob_properties_typeProperties_serviceEndpoint": {
-						"value": "[parameters('CRM UAT Blob_properties_typeProperties_serviceEndpoint')]"
+					"PSFTRestAPI_password": {
+						"value": "[parameters('PSFTRestAPI_password')]"
+					},
+					"SqlServer_connectionString": {
+						"value": "[parameters('SqlServer_connectionString')]"
 					},
 					"McMasterAPIs_properties_typeProperties_url": {
 						"value": "[parameters('McMasterAPIs_properties_typeProperties_url')]"
+					},
+					"PSFTRestAPI_properties_typeProperties_url": {
+						"value": "[parameters('PSFTRestAPI_properties_typeProperties_url')]"
+					},
+					"PSFTRestAPI_properties_typeProperties_userName": {
+						"value": "[parameters('PSFTRestAPI_properties_typeProperties_userName')]"
 					}
 				}
 			},
