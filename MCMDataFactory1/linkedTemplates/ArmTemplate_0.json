@@ -346,6 +346,7 @@
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
+					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": []
@@ -624,7 +625,7 @@
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
 									"wildcardFolderPath": "TestMerge",
-									"wildcardFileName": "*",
+									"wildcardFileName": "*.xlsx",
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {

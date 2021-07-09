@@ -586,7 +586,7 @@
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
 									"wildcardFolderPath": "TestMerge",
-									"wildcardFileName": "*",
+									"wildcardFileName": "*.xlsx",
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
@@ -657,6 +657,7 @@
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
+					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": []
