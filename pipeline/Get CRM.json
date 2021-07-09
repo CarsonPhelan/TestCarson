@@ -16,15 +16,15 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "JsonSource",
+						"type": "DelimitedTextSource",
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
-							"wildcardFileName": "model.json",
+							"wildcardFolderPath": "crm",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
-							"type": "JsonReadSettings"
+							"type": "DelimitedTextReadSettings"
 						}
 					},
 					"sink": {
@@ -120,13 +120,12 @@
 									"ordinal": 7
 								}
 							}
-						],
-						"collectionReference": "$['entities']"
+						]
 					}
 				},
 				"inputs": [
 					{
-						"referenceName": "CRMEmails",
+						"referenceName": "CRMCSV",
 						"type": "DatasetReference"
 					}
 				],
