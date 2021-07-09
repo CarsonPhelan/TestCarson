@@ -313,8 +313,6 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "00929a29-48ac-4b4e-8340-1d4414c630e4",
-						"folderPath": "csv/ActivityContactBlocked",
 						"container": "dynamicspbi"
 					},
 					"columnDelimiter": ",",
@@ -472,6 +470,8 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
+									"wildcardFolderPath": "crm",
+									"wildcardFileName": "*.csv",
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
@@ -482,7 +482,7 @@
 								"type": "DelimitedTextSink",
 								"storeSettings": {
 									"type": "AzureBlobStorageWriteSettings",
-									"copyBehavior": "FlattenHierarchy"
+									"copyBehavior": "MergeFiles"
 								},
 								"formatSettings": {
 									"type": "DelimitedTextWriteSettings",
@@ -504,74 +504,6 @@
 									},
 									"path": "cp-lake1"
 								}
-							},
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"path": "$['name']"
-										},
-										"sink": {
-											"type": "String",
-											"ordinal": 1
-										}
-									},
-									{
-										"source": {
-											"path": "$['description']"
-										},
-										"sink": {
-											"type": "String",
-											"ordinal": 2
-										}
-									},
-									{
-										"source": {
-											"path": "$['version']"
-										},
-										"sink": {
-											"type": "String",
-											"ordinal": 3
-										}
-									},
-									{
-										"source": {
-											"path": "[['$type']"
-										},
-										"sink": {
-											"type": "String",
-											"ordinal": 4
-										}
-									},
-									{
-										"source": {
-											"path": "[['name']"
-										},
-										"sink": {
-											"type": "String",
-											"ordinal": 5
-										}
-									},
-									{
-										"source": {
-											"path": "[['attributes'][0]['name']"
-										},
-										"sink": {
-											"type": "String",
-											"ordinal": 6
-										}
-									},
-									{
-										"source": {
-											"path": "[['attributes'][0]['dataType']"
-										},
-										"sink": {
-											"type": "String",
-											"ordinal": 7
-										}
-									}
-								]
 							}
 						},
 						"inputs": [
