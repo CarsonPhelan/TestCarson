@@ -325,6 +325,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
+						"fileName": "Emails.csv",
 						"container": "cp-lake1"
 					},
 					"columnDelimiter": ",",
