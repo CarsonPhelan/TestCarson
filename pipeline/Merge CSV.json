@@ -1,9 +1,9 @@
 {
-	"name": "Get CRM",
+	"name": "Merge CSV",
 	"properties": {
 		"activities": [
 			{
-				"name": "TransCRMEmails",
+				"name": "Merge CSV Files",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -20,6 +20,7 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
+							"wildcardFolderPath": "csv/ActivityContactBlocked",
 							"wildcardFileName": "*.csv",
 							"enablePartitionDiscovery": false
 						},
@@ -57,7 +58,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "LocalCSV",
+						"referenceName": "CRMCSV",
 						"type": "DatasetReference"
 					}
 				],
