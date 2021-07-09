@@ -313,6 +313,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
+						"folderPath": "csv/ActivityContactBlocked",
 						"container": "dynamicspbi"
 					},
 					"columnDelimiter": ",",
@@ -470,7 +471,7 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"wildcardFolderPath": "crm",
+									"wildcardFolderPath": "*",
 									"wildcardFileName": "*.csv",
 									"enablePartitionDiscovery": false
 								},
