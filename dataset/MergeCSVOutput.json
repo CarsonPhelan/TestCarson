@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "Merged.xlsx",
+				"fileName": "Merged.csv",
 				"folderPath": "TestMerge/Merged",
 				"container": "cp-lake1"
 			},
