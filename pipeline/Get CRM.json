@@ -20,7 +20,7 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
-							"wildcardFolderPath": "*",
+							"wildcardFolderPath": "crm/ActivityContactBlocked",
 							"wildcardFileName": "*.csv",
 							"enablePartitionDiscovery": false
 						},
