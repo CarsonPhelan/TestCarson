@@ -62,7 +62,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "CRMEmailCSV",
+						"referenceName": "MergeCSVOutput",
 						"type": "DatasetReference"
 					}
 				]
