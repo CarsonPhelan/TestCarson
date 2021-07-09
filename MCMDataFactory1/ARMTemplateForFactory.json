@@ -586,7 +586,7 @@
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
 									"wildcardFolderPath": "TestMerge",
-									"wildcardFileName": "*.xlsx",
+									"wildcardFileName": "*",
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
@@ -680,7 +680,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "Merged.csv",
+						"fileName": "Merged.xlsx",
 						"folderPath": "TestMerge/Merged",
 						"container": "cp-lake1"
 					},
