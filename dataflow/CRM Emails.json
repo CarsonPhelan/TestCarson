@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "CRMCSV",
+						"referenceName": "EmailJSON",
 						"type": "DatasetReference"
 					},
 					"name": "EmailsHeader"
@@ -22,7 +22,7 @@
 				}
 			],
 			"transformations": [],
-			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 30,\n\tignoreNoFilesFound: false) ~> EmailsHeader\nEmailsHeader sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string\n\t),\n\tpartitionFileNames:['EmailsDataflow.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> WriteToCSV"
+			"script": "source(output(\n\t\tname as string,\n\t\tdescription as string,\n\t\tversion as string,\n\t\tentities as ({$type} as string, name as string, attributes as (name as string, dataType as string)[])[]\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 2,\n\tignoreNoFilesFound: false,\n\tdocumentForm: 'documentPerLine') ~> EmailsHeader\nEmailsHeader sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string\n\t),\n\tpartitionFileNames:['EmailsDataflow.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> WriteToCSV"
 		}
 	}
 }
