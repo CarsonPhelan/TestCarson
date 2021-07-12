@@ -63,7 +63,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "CRMEmailCSV",
+						"referenceName": "TargetCRMEmailCSV",
 						"type": "DatasetReference"
 					}
 				]

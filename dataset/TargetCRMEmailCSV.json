@@ -1,5 +1,5 @@
 {
-	"name": "CRMEmailCSV",
+	"name": "TargetCRMEmailCSV",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LocalBlob",
@@ -14,6 +14,7 @@
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
+			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
 		"schema": [
