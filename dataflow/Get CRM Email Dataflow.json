@@ -1,16 +1,20 @@
 {
-	"name": "dataflow1",
+	"name": "Get CRM Email Dataflow",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
 				{
+					"dataset": {
+						"referenceName": "LocalCSV",
+						"type": "DatasetReference"
+					},
 					"name": "CRMCSVs"
 				}
 			],
 			"sinks": [],
 			"transformations": [],
-			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> CRMCSVs"
+			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> CRMCSVs"
 		}
 	}
 }

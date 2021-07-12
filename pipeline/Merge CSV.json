@@ -77,7 +77,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "dataflow1",
+						"referenceName": "Get CRM Email Dataflow",
 						"type": "DataFlowReference"
 					},
 					"compute": {
