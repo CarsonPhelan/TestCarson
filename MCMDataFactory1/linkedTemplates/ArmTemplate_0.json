@@ -143,7 +143,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/CRMEmailCSV')]",
+			"name": "[concat(parameters('factoryName'), '/TargetCRMEmailCSV')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -160,6 +160,7 @@
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
+					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": [
@@ -584,7 +585,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "CRMEmailCSV",
+								"referenceName": "TargetCRMEmailCSV",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -595,7 +596,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/CRMCSV')]",
-				"[concat(variables('factoryId'), '/datasets/CRMEmailCSV')]",
+				"[concat(variables('factoryId'), '/datasets/TargetCRMEmailCSV')]",
 				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
 			]
 		},
@@ -695,23 +696,23 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "CRMEmailCSV",
+								"referenceName": "TargetCRMEmailCSV",
 								"type": "DatasetReference"
 							},
 							"name": "WriteToCSV"
 						}
 					],
 					"transformations": [],
-					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 20,\n\tignoreNoFilesFound: false) ~> EmailsHeader\nEmailsHeader sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string\n\t),\n\tpartitionFileNames:['EmailsDataflow.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> WriteToCSV"
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 30,\n\tignoreNoFilesFound: false) ~> EmailsHeader\nEmailsHeader sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string\n\t),\n\tpartitionFileNames:['EmailsDataflow.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> WriteToCSV"
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/CRMCSV')]",
-				"[concat(variables('factoryId'), '/datasets/CRMEmailCSV')]"
+				"[concat(variables('factoryId'), '/datasets/TargetCRMEmailCSV')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"name": "[concat(parameters('factoryName'), '/Email DataFlow')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
