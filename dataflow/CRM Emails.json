@@ -1,0 +1,28 @@
+{
+	"name": "CRM Emails",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CRMCSV",
+						"type": "DatasetReference"
+					},
+					"name": "EmailsHeader"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CRMEmailCSV",
+						"type": "DatasetReference"
+					},
+					"name": "WriteToCSV"
+				}
+			],
+			"transformations": [],
+			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 20,\n\tignoreNoFilesFound: false) ~> EmailsHeader\nEmailsHeader sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> WriteToCSV"
+		}
+	}
+}
