@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "LocalCSV",
+						"referenceName": "CRMCSV",
 						"type": "DatasetReference"
 					},
 					"name": "CRMCSVs"
