@@ -10,7 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "skiplines.csv",
 				"folderPath": "TestMerge",
 				"container": "cp-lake1"
 			},
