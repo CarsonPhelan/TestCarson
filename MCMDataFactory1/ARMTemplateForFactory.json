@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "MCMDataFactory1"
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
 		"CRM UAT Blob_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'CRM UAT Blob'"
@@ -22,6 +26,10 @@
 		"SqlServer_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SqlServer'"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://mcmdatawarehouse.dfs.core.windows.net"
 		},
 		"McMasterAPIs_properties_typeProperties_url": {
 			"type": "string",
@@ -40,6 +48,34 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SkipLines')]",
+			"type": "Microsoft.DataFactory/factories/templates",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SkipLines')]",
+			"type": "Microsoft.DataFactory/factories/templates",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SkipLines')]",
+			"type": "Microsoft.DataFactory/factories/templates",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SkipLines')]",
+			"type": "Microsoft.DataFactory/factories/templates",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/CopyHolidayAPI')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -159,49 +195,6 @@
 				"[concat(variables('factoryId'), '/datasets/SourceDataset_81q')]",
 				"[concat(variables('factoryId'), '/datasets/DestinationDataset_81q')]",
 				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Email DataFlow')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "CRM Emails",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "1.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "CRM Emails",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"EmailsHeader": {},
-									"Sink": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/CRM Emails')]"
 			]
 		},
 		{
@@ -364,6 +357,132 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SkipLines')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "wheretostart",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "wheredoesmydatabegin",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "wheretostart",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFileName": "HeaderSelect.csv",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "LocalCSV",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "WriteSkippedRows",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "skipped",
+								"type": "DataFlowReference",
+								"parameters": {
+									"skiplines": {
+										"value": "'@{activity('Lookup1').output.firstRow.firstline}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"skiplines": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/wheredoesmydatabegin')]",
+				"[concat(variables('factoryId'), '/datasets/LocalCSV')]",
+				"[concat(variables('factoryId'), '/dataflows/skipped')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/CRMCSV')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -439,6 +558,33 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/CRM UAT Blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/EmailsNoHeader')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LocalBlob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "TestMerge/Merged",
+						"container": "cp-lake1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
 			]
 		},
 		{
@@ -671,6 +817,79 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/folderout')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LocalBlob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "output/mydataflow123partfiles",
+						"container": "mycontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/readskipped')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "salesskip.csv",
+						"folderPath": "SampleData",
+						"fileSystem": "mycontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/CRM UAT Blob')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -775,7 +994,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/CRM Emails')]",
+			"name": "[concat(parameters('factoryName'), '/skipped')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -787,7 +1006,41 @@
 								"referenceName": "CRMCSV",
 								"type": "DatasetReference"
 							},
-							"name": "EmailsHeader"
+							"name": "skiplines"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "EmailsNoHeader",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"script": "parameters{\n\tskiplines as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tskipLines: (toInteger($skiplines))) ~> skiplines\nskiplines sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\temptyLinesAsHeader: (toInteger($skiplines)),\n\tpartitionBy('hash', 1)) ~> sink1"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/CRMCSV')]",
+				"[concat(variables('factoryId'), '/datasets/EmailsNoHeader')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/wheredoesmydatabegin')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CRMCSV",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
 						}
 					],
 					"sinks": [
@@ -796,7 +1049,7 @@
 								"referenceName": "LocalCSV",
 								"type": "DatasetReference"
 							},
-							"name": "Sink"
+							"name": "sink1"
 						}
 					],
 					"transformations": [
@@ -810,20 +1063,13 @@
 							"name": "FindFirstLine"
 						}
 					],
-					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 2,\n\tignoreNoFilesFound: false) ~> EmailsHeader\nEmailsHeader keyGenerate(output(rownum as long),\n\tstartAt: 1L) ~> AddRowNums\nAddRowNums derive(rownum = iif(!isNull(toInteger(left(toString(byPosition(1)),1))),toInteger(rownum),toInteger(0))) ~> DefineDataLines\nDefineDataLines aggregate(rownum = minIf(rownum!=0,rownum)) ~> FindFirstLine\nFindFirstLine sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['HeaderSelect.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> Sink"
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 keyGenerate(output(rownum as long),\n\tstartAt: 1L) ~> AddRowNums\nAddRowNums derive(datalines = iif(!isNull(toInteger(left(toString(byPosition(1)),1))),toInteger(rownum),toInteger(9999999))) ~> DefineDataLines\nDefineDataLines aggregate(firstline = toInteger(minIf(datalines!=0,datalines))) ~> FindFirstLine\nFindFirstLine sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['HeaderSelect.csv'],\n\tpartitionBy('hash', 1)) ~> sink1"
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/CRMCSV')]",
 				"[concat(variables('factoryId'), '/datasets/LocalCSV')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SkipLines')]",
-			"type": "Microsoft.DataFactory/factories/templates",
-			"apiVersion": "2018-06-01",
-			"properties": {},
-			"dependsOn": []
 		}
 	]
 }

@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "MCMDataFactory1"
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"value": ""
+		},
 		"CRM UAT Blob_connectionString": {
 			"value": ""
 		},
@@ -16,6 +19,9 @@
 		},
 		"SqlServer_connectionString": {
 			"value": ""
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://mcmdatawarehouse.dfs.core.windows.net"
 		},
 		"McMasterAPIs_properties_typeProperties_url": {
 			"value": "https://apis.mcmaster.ca/mcmaster-university/sandbox/holidays/MACUG/UGRD/2201"

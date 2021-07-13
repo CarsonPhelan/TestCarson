@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "MCMDataFactory1"
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
 		"CRM UAT Blob_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'CRM UAT Blob'"
@@ -22,6 +26,10 @@
 		"SqlServer_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SqlServer'"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://mcmdatawarehouse.dfs.core.windows.net"
 		},
 		"McMasterAPIs_properties_typeProperties_url": {
 			"type": "string",
@@ -40,6 +48,37 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SkipLines')]",
+			"type": "Microsoft.DataFactory/factories/templates",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SkipLines')]",
+			"type": "Microsoft.DataFactory/factories/templates",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/CRM UAT Blob')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -112,13 +151,6 @@
 					"connectionString": "[parameters('SqlServer_connectionString')]"
 				}
 			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SkipLines')]",
-			"type": "Microsoft.DataFactory/factories/templates",
-			"apiVersion": "2018-06-01",
-			"properties": {},
 			"dependsOn": []
 		},
 		{
@@ -197,6 +229,33 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/CRM UAT Blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/EmailsNoHeader')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LocalBlob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "TestMerge/Merged",
+						"container": "cp-lake1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
 			]
 		},
 		{
@@ -429,327 +488,31 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/CopyHolidayAPI')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/folderout')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
-					{
-						"name": "Copy_81q",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [
-							{
-								"name": "Destination",
-								"value": "cp-lake1//data_0a27ac1e-d873-49dd-ac5b-fc2014974cb8_e1e4202f-a7e5-4820-b6dc-cb1b26ed2f04.parquet"
-							}
-						],
-						"typeProperties": {
-							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "00:01:40",
-								"requestInterval": "00.00:00:00.010",
-								"requestMethod": "GET"
-							},
-							"sink": {
-								"type": "ParquetSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "ParquetWriteSettings"
-								}
-							},
-							"enableStaging": false,
-							"logSettings": {
-								"enableCopyActivityLog": true,
-								"copyActivityLogSettings": {
-									"logLevel": "Warning",
-									"enableReliableLogging": false
-								},
-								"logLocationSettings": {
-									"linkedServiceName": {
-										"referenceName": "LocalBlob",
-										"type": "LinkedServiceReference"
-									},
-									"path": "cp-lake1"
-								}
-							},
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"path": "[['scheduleId']"
-										},
-										"sink": {
-											"name": "scheduleId",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['date']"
-										},
-										"sink": {
-											"name": "date",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['description']"
-										},
-										"sink": {
-											"name": "description",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['hours']"
-										},
-										"sink": {
-											"name": "hours",
-											"type": "Int64"
-										}
-									}
-								],
-								"collectionReference": "$['holidays']"
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "SourceDataset_81q",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DestinationDataset_81q",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SourceDataset_81q')]",
-				"[concat(variables('factoryId'), '/datasets/DestinationDataset_81q')]",
-				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Get CRM')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "TransCRMEmails",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "JsonReadSettings"
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings",
-									"copyBehavior": "MergeFiles"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".csv"
-								}
-							},
-							"enableStaging": false,
-							"logSettings": {
-								"enableCopyActivityLog": true,
-								"copyActivityLogSettings": {
-									"logLevel": "Warning",
-									"enableReliableLogging": false
-								},
-								"logLocationSettings": {
-									"linkedServiceName": {
-										"referenceName": "LocalBlob",
-										"type": "LinkedServiceReference"
-									},
-									"path": "cp-lake1"
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "EmailJSON",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "TargetCRMEmailCSV",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/EmailJSON')]",
-				"[concat(variables('factoryId'), '/datasets/TargetCRMEmailCSV')]",
-				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Merge CSV')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "MergeCSV",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "TestMerge",
-									"wildcardFileName": "*",
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings",
-									"copyBehavior": "MergeFiles"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "LocalCSV",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "MergeCSVOutput",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/LocalCSV')]",
-				"[concat(variables('factoryId'), '/datasets/MergeCSVOutput')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/CRM Emails')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
+				"linkedServiceName": {
+					"referenceName": "LocalBlob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
 				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "CRMCSV",
-								"type": "DatasetReference"
-							},
-							"name": "EmailsHeader"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "LocalCSV",
-								"type": "DatasetReference"
-							},
-							"name": "Sink"
-						}
-					],
-					"transformations": [
-						{
-							"name": "AddRowNums"
-						},
-						{
-							"name": "DefineDataLines"
-						},
-						{
-							"name": "FindFirstLine"
-						}
-					],
-					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 2,\n\tignoreNoFilesFound: false) ~> EmailsHeader\nEmailsHeader keyGenerate(output(rownum as long),\n\tstartAt: 1L) ~> AddRowNums\nAddRowNums derive(rownum = iif(!isNull(toInteger(left(toString(byPosition(1)),1))),toInteger(rownum),toInteger(0))) ~> DefineDataLines\nDefineDataLines aggregate(rownum = minIf(rownum!=0,rownum)) ~> FindFirstLine\nFindFirstLine sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['HeaderSelect.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> Sink"
-				}
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "output/mydataflow123partfiles",
+						"container": "mycontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/CRMCSV')]",
-				"[concat(variables('factoryId'), '/datasets/LocalCSV')]"
+				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
 			]
 		}
 	]
