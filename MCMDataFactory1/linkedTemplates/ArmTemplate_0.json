@@ -115,6 +115,13 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SkipLines')]",
+			"type": "Microsoft.DataFactory/factories/templates",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/CRMCSV')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -128,10 +135,11 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
+						"fileName": "00929a29-48ac-4b4e-8340-1d4414c630e4",
 						"folderPath": "csv/ActivityContactBlocked",
 						"container": "dynamicspbi"
 					},
-					"columnDelimiter": ",",
+					"columnDelimiter": "",
 					"escapeChar": "\\",
 					"firstRowAsHeader": false,
 					"quoteChar": "\""
@@ -140,46 +148,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/CRM UAT Blob')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/TargetCRMEmailCSV')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LocalBlob",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"container": "cp-lake1"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
 			]
 		},
 		{
@@ -205,6 +173,30 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/EmailJSON')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "CRM UAT Blob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "model.json",
+						"container": "dynamicspbi"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/CRM UAT Blob')]"
 			]
 		},
 		{
@@ -397,6 +389,46 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/TargetCRMEmailCSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LocalBlob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "cp-lake1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/CopyHolidayAPI')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -537,15 +569,14 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "DelimitedTextSource",
+								"type": "JsonSource",
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"wildcardFileName": "*",
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
+									"type": "JsonReadSettings"
 								}
 							},
 							"sink": {
@@ -578,7 +609,7 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "CRMCSV",
+								"referenceName": "EmailJSON",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -595,7 +626,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/CRMCSV')]",
+				"[concat(variables('factoryId'), '/datasets/EmailJSON')]",
 				"[concat(variables('factoryId'), '/datasets/TargetCRMEmailCSV')]",
 				"[concat(variables('factoryId'), '/linkedServices/LocalBlob')]"
 			]
@@ -696,92 +727,29 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "TargetCRMEmailCSV",
+								"referenceName": "LocalCSV",
 								"type": "DatasetReference"
 							},
-							"name": "WriteToCSV"
+							"name": "Sink"
 						}
 					],
-					"transformations": [],
-					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 30,\n\tignoreNoFilesFound: false) ~> EmailsHeader\nEmailsHeader sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string\n\t),\n\tpartitionFileNames:['EmailsDataflow.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> WriteToCSV"
+					"transformations": [
+						{
+							"name": "AddRowNums"
+						},
+						{
+							"name": "DefineDataLines"
+						},
+						{
+							"name": "FindFirstLine"
+						}
+					],
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 2,\n\tignoreNoFilesFound: false) ~> EmailsHeader\nEmailsHeader keyGenerate(output(rownum as long),\n\tstartAt: 1L) ~> AddRowNums\nAddRowNums derive(rownum = iif(!isNull(toInteger(left(toString(byPosition(1)),1))),toInteger(rownum),toInteger(0))) ~> DefineDataLines\nDefineDataLines aggregate(rownum = minIf(rownum!=0,rownum)) ~> FindFirstLine\nFindFirstLine sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['HeaderSelect.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> Sink"
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/CRMCSV')]",
-				"[concat(variables('factoryId'), '/datasets/TargetCRMEmailCSV')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Email DataFlow')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "CRM Emails",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "1.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "CRM Emails",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"EmailsHeader": {},
-									"WriteToCSV": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/CRM Emails')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Trigger_81q')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "CopyHolidayAPI",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Hour",
-						"interval": 24,
-						"startTime": "2021-07-08T15:01:00Z",
-						"timeZone": "UTC"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/CopyHolidayAPI')]"
+				"[concat(variables('factoryId'), '/datasets/LocalCSV')]"
 			]
 		}
 	]
