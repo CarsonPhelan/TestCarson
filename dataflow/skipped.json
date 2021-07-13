@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "readskipped",
+						"referenceName": "CRMCSV",
 						"type": "DatasetReference"
 					},
 					"name": "skiplines"
@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "folderout",
+						"referenceName": "EmailsNoHeader",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
