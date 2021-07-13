@@ -10,7 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "HeadersSkipped",
 				"folderPath": "TestMerge/Merged",
 				"container": "cp-lake1"
 			},
