@@ -479,7 +479,7 @@
 								"type": "DataFlowReference",
 								"parameters": {
 									"skiplines": {
-										"value": "'@{activity('Lookup1').output.firstRow.firstline}'",
+										"value": "@activity('Lookup1').output.firstRow.firstline",
 										"type": "Expression"
 									}
 								},
