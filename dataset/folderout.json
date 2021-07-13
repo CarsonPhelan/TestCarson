@@ -1,5 +1,5 @@
 {
-	"name": "LocalCSV",
+	"name": "folderout",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LocalBlob",
@@ -10,13 +10,12 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "skiplines.csv",
-				"folderPath": "TestMerge",
-				"container": "cp-lake1"
+				"folderPath": "output/mydataflow123partfiles",
+				"container": "mycontainer"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
-			"firstRowAsHeader": false,
+			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
 		"schema": []

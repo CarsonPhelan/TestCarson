@@ -1,22 +1,21 @@
 {
-	"name": "LocalCSV",
+	"name": "readskipped",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "LocalBlob",
+			"referenceName": "AzureDataLakeStorage1",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobStorageLocation",
-				"fileName": "skiplines.csv",
-				"folderPath": "TestMerge",
-				"container": "cp-lake1"
+				"type": "AzureBlobFSLocation",
+				"fileName": "salesskip.csv",
+				"folderPath": "SampleData",
+				"fileSystem": "mycontainer"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
-			"firstRowAsHeader": false,
 			"quoteChar": "\""
 		},
 		"schema": []

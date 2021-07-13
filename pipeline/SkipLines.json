@@ -1,13 +1,13 @@
 {
-	"name": "Email DataFlow",
+	"name": "SkipLines",
 	"properties": {
 		"activities": [
 			{
-				"name": "CRM Emails",
+				"name": "wheretostart",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "1.00:00:00",
+					"timeout": "7.00:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "CRM Emails",
+						"referenceName": "wheredoesmydatabegin",
 						"type": "DataFlowReference"
 					},
 					"compute": {
@@ -27,18 +27,38 @@
 				}
 			},
 			{
-				"name": "WriteEmails",
-				"type": "ExecuteDataFlow",
+				"name": "Lookup1",
+				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "CRM Emails",
+						"activity": "wheretostart",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					}
 				],
 				"policy": {
-					"timeout": "1.00:00:00",
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			},
+			{
+				"name": "WriteSkippedRows",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -47,8 +67,14 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "WriteEmails",
-						"type": "DataFlowReference"
+						"referenceName": "skipped",
+						"type": "DataFlowReference",
+						"parameters": {
+							"skiplines": {
+								"value": "'@{activity('Lookup1').output.firstRow.firstline}'",
+								"type": "Expression"
+							}
+						}
 					},
 					"compute": {
 						"coreCount": 8,
@@ -58,12 +84,6 @@
 				}
 			}
 		],
-		"parameters": {
-			"skiplines": {
-				"type": "string",
-				"defaultValue": "@activity('Lookup1').output.firstRow.firstLine"
-			}
-		},
 		"annotations": []
 	}
 }

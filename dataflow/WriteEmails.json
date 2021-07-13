@@ -1,0 +1,20 @@
+{
+	"name": "WriteEmails",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CRMCSV",
+						"type": "DatasetReference"
+					},
+					"name": "skiplines"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tskipLines: (toInteger($skiplines))) ~> skiplines"
+		}
+	}
+}
