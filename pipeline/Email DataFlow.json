@@ -58,6 +58,12 @@
 				}
 			}
 		],
+		"parameters": {
+			"skiplines": {
+				"type": "string",
+				"defaultValue": "@activity('Lookup1').output.firstRow.firstLine"
+			}
+		},
 		"annotations": []
 	}
 }

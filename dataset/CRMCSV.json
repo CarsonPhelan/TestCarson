@@ -5,12 +5,6 @@
 			"referenceName": "CRM UAT Blob",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"skiplines": {
-				"type": "string",
-				"defaultValue": "@activity('Lookup1').output.firstRow.firstLine"
-			}
-		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
