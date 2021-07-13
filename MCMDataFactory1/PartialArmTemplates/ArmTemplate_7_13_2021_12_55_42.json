@@ -1,0 +1,47 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "MCMDataFactory1"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/skipped')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CRMCSV",
+								"type": "DatasetReference"
+							},
+							"name": "skiplines"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "EmailsNoHeader",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"script": "parameters{\n\tskiplines as integer\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tskipLines: ($skiplines)) ~> skiplines\nskiplines sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\temptyLinesAsHeader: (toInteger($skiplines)),\n\tpartitionBy('hash', 1)) ~> sink1"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
