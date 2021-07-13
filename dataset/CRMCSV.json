@@ -10,10 +10,11 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
+				"fileName": "00929a29-48ac-4b4e-8340-1d4414c630e4",
 				"folderPath": "csv/ActivityContactBlocked",
 				"container": "dynamicspbi"
 			},
-			"columnDelimiter": ",",
+			"columnDelimiter": "",
 			"escapeChar": "\\",
 			"firstRowAsHeader": false,
 			"quoteChar": "\""

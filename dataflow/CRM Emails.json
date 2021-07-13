@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "EmailJSON",
+						"referenceName": "CRMCSV",
 						"type": "DatasetReference"
 					},
 					"name": "EmailsHeader"
@@ -15,14 +15,24 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "TargetCRMEmailCSV",
+						"referenceName": "LocalCSV",
 						"type": "DatasetReference"
 					},
-					"name": "WriteToCSV"
+					"name": "Sink"
 				}
 			],
-			"transformations": [],
-			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 2,\n\tignoreNoFilesFound: false,\n\tdocumentForm: 'documentPerLine') ~> EmailsHeader\nEmailsHeader sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string\n\t),\n\tpartitionFileNames:['EmailsDataflow.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> WriteToCSV"
+			"transformations": [
+				{
+					"name": "AddRowNums"
+				},
+				{
+					"name": "DefineDataLines"
+				},
+				{
+					"name": "FindFirstLine"
+				}
+			],
+			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 2,\n\tignoreNoFilesFound: false) ~> EmailsHeader\nEmailsHeader keyGenerate(output(rownum as long),\n\tstartAt: 1L) ~> AddRowNums\nAddRowNums derive(rownum = iif(!isNull(toInteger(left(toString(byPosition(1)),1))),toInteger(rownum),toInteger(0))) ~> DefineDataLines\nDefineDataLines aggregate(rownum = minIf(rownum!=0,rownum)) ~> FindFirstLine\nFindFirstLine sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['HeaderSelect.csv'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> Sink"
 		}
 	}
 }
